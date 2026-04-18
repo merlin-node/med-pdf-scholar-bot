@@ -1,0 +1,27 @@
+services:
+  pdf-scholar-bot:
+    image: ghcr.io/merlin-node/med-pdf-scholar-bot:latest
+    
+    container_name: pdf_scholar_bot
+    restart: unless-stopped
+
+    
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ALLOWED_USER_IDS=${ALLOWED_USER_IDS}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+
+    # ── 资源限制（保护你的“大盘鸡”不被榨干） ───────────────────────────
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+    # ── 日志管理（防止日志撑爆硬盘） ──────────────────────────────
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
