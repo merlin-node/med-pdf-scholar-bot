@@ -66,7 +66,7 @@ ANALYSIS_PROMPT = """
 # ❓ 延伸思考
 4~5个研究问题，每个：**标题：** 描述
 
-**必须完整输出以上6个章节，不得截断。**
+**按顺序依次输出，如内容过多请精简前面章节。**
 
 """
 
@@ -103,7 +103,7 @@ def _sync_analyze(pdf_path: str) -> str:
         response = model.generate_content(
             contents=[remote, ANALYSIS_PROMPT],
             generation_config=genai_types.GenerationConfig(
-                temperature=0.1,
+                temperature=0.2,
                 max_output_tokens=32768,
             ),
             request_options={"timeout": 600},
