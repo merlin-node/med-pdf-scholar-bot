@@ -123,7 +123,7 @@ def _sync_analyze(pdf_path: str) -> str:
         response = model.generate_content(
             contents=[remote, ANALYSIS_PROMPT],
             generation_config=genai_types.GenerationConfig(
-                temperature=0.3,
+                temperature=0.1,
                 max_output_tokens=32768,
             ),
             request_options={"timeout": 600},
