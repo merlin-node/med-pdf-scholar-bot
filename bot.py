@@ -96,22 +96,32 @@ def _delete_remote(f: genai_types.File) -> None:
 
 
 def _sync_analyze(pdf_path: str) -> str:
-    remote = None
-    try:
-        remote = _upload_and_wait(pdf_path)
-        model = genai.GenerativeModel(model_name=GEMINI_MODEL)
-        response = model.generate_content(
-            contents=[remote, ANALYSIS_PROMPT],
-            generation_config=genai_types.GenerationConfig(
-                temperature=0.2,
-                max_output_tokens=32768,
-            ),
-            request_options={"timeout": 600},
-        )
-        return response.text
-    finally:
-        if remote is not None:
-            _delete_remote(remote)
+    last_error = None
+    for attempt in range(1, 4):
+        remote = None
+        try:
+            logger.info("Analyze attempt %d/3", attempt)
+            remote = _upload_and_wait(pdf_path)
+            model = genai.GenerativeModel(model_name=GEMINI_MODEL)
+            response = model.generate_content(
+                contents=[remote, ANALYSIS_PROMPT],
+                generation_config=genai_types.GenerationConfig(
+                    temperature=0.2,
+                    max_output_tokens=32768,
+                ),
+                request_options={"timeout": 600},
+            )
+            return response.text
+        except Exception as exc:
+            last_error = exc
+            logger.warning("Attempt %d failed: %s", attempt, exc)
+            if attempt < 3:
+                time.sleep(5 * attempt)  # 5s, 10s 递增等待
+        finally:
+            if remote is not None:
+                _delete_remote(remote)
+    raise last_error
+
 
 
 def _write_md(notes: str, original_name: str) -> str:
