@@ -130,7 +130,7 @@ async def _reject(update: Update) -> None:
     uid = update.effective_user.id
     name = update.effective_user.username or update.effective_user.first_name
     logger.warning("Rejected unauthorized user: %s (%d)", name, uid)
-    await update.message.reply_text("no access.")
+    await update.message.reply_text("⛔ 无访问权限。")
 
 
 async def cmd_start(update: Update, _ctx: ContextTypes.DEFAULT_TYPE) -> None:
